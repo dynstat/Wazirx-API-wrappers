@@ -8,14 +8,17 @@ try:
     import base64
     import json
     import pydantic
+    from pydantic import BaseModel
 except ImportError:
     print("Please install the required modules, try running 'pip install -r requirements.txt'")
 
 load_dotenv()
 
-from pydantic import BaseModel
+SIGNATURE = os.getenv("SIGNATURE")
+APIKEY = os.getenv("APIKEY")
+SECRET_KEY = os.getenv("SECRET_KEY")
+PRIVATE_KEY = os.getenv("RSA_PRIVATE_KEY")
 
-from pydantic import BaseModel
 
 wazirx_api_domain = "https://api.wazirx.com"
 
