@@ -23,7 +23,7 @@ Create a `.env` file in the root directory of the project and populate it with y
 SIGNATURE=your_signature_here
 APIKEY=your_api_key_here
 SECRET_KEY=your_secret_key_here
-RSA_PRIVATE_KEY=your_rsa_private_key_here
+RSA_PRIVATE_KEY=your_rsa_private_key_here # OPTIONAL. Not needed if you have SECRET_KEY.
 ```
 
 These keys are used for authenticating requests to the WazirX API.
