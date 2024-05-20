@@ -1,5 +1,6 @@
 try:
     import logging
+    from logging.handlers import RotatingFileHandler
     import time
     import requests
     from dotenv import load_dotenv
@@ -11,17 +12,36 @@ try:
     import pydantic
     from pydantic import BaseModel
     from .symbols import assets_set, base_currency_set
+    import threading
 except ImportError:
     print("Please install the required modules, try running 'pip install -r requirements.txt'")
 
 load_dotenv()
 
-# Configure logging
-logging.basicConfig(
+# Configure logging with RotatingFileHandler
+log_handler = RotatingFileHandler(
     filename='api.log',
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
+    mode='a',  # Append mode
+    maxBytes=5*1024*1024,  # 5 MB
+    backupCount=2,  # Keep 2 backup files
+    encoding=None,
+    delay=0
 )
+log_handler.setLevel(logging.INFO)
+log_handler.setFormatter(logging.Formatter('%(levelname)s - %(message)s - [Function: %(funcName)s] - [Time: %(asctime)s]'))
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+logger.addHandler(log_handler)
+
+
+# # Configure logging
+# logging.basicConfig(
+#     filename='api.log',
+#     filemode='w',  # 'a' mode appends to the file instead of clearing it
+#     level=logging.INFO,
+#     format='%(levelname)s - %(message)s - [Function: %(funcName)s] - [Time: %(asctime)s]',
+# )
 
 SIGNATURE = os.getenv("SIGNATURE")
 APIKEY = os.getenv("APIKEY")
