@@ -1,4 +1,5 @@
 try:
+    import logging
     import time
     import requests
     from dotenv import load_dotenv
@@ -9,10 +10,18 @@ try:
     import json
     import pydantic
     from pydantic import BaseModel
+    from .symbols import assets_set, base_currency_set
 except ImportError:
     print("Please install the required modules, try running 'pip install -r requirements.txt'")
 
 load_dotenv()
+
+# Configure logging
+logging.basicConfig(
+    filename='api.log',
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
 
 SIGNATURE = os.getenv("SIGNATURE")
 APIKEY = os.getenv("APIKEY")
@@ -31,10 +40,13 @@ class WazirxAPIModel(BaseModel):
     ticker_24hr: str
     order_book_depth: str
     historical_trades: str
-    new_order: str
+
     test_new_order: str
     account_info: str
     funds: str
+    open_orders: str
+    order: str
+    
     create_auth_token: str
     
 wzx_api = WazirxAPIModel(
@@ -46,9 +58,14 @@ wzx_api = WazirxAPIModel(
     ticker_24hr=f"{wazirx_api_domain}/sapi/v1/ticker/24hr", # ?symbol={symbol}",
     order_book_depth=f"{wazirx_api_domain}/sapi/v1/depth", # ?symbol={symbol}&limit={limit}",
     historical_trades=f"{wazirx_api_domain}/sapi/v1/historicalTrades", # ?symbol={symbol}",
-    new_order=f"{wazirx_api_domain}/sapi/v1/order",
+ 
     test_new_order=f"{wazirx_api_domain}/sapi/v1/order/test",
     account_info=f"{wazirx_api_domain}/sapi/v1/account",
-    funds=f"{wazirx_api_domain}/sapi/v1/funds",
+    
+    funds=f"{wazirx_api_domain}/sapi/v1/funds", #Tested
+    open_orders=f"{wazirx_api_domain}/sapi/v1/openOrders", #Tested
+    order=f"{wazirx_api_domain}/sapi/v1/order", #Tested
+    
     create_auth_token=f"{wazirx_api_domain}/sapi/v1/create_auth_token"
 )
+
