@@ -24,3 +24,13 @@ def add_query_params(api_endpoint: str, query_params: dict) -> str:
         full_url += query_string
 
     return full_url
+
+
+def remove_unwanted_keys(order_dict:dict) -> dict:
+    # Keys to remove
+    keys_to_remove = ['updatedTime', 'createdTime']
+    
+    # Create a new dictionary without the specified keys
+    new_dict = {key: value for key, value in order_dict.items() if key not in keys_to_remove}
+    
+    return new_dict
