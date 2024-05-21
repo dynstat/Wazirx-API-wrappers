@@ -18,10 +18,14 @@ except ImportError:
 
 load_dotenv()
 
+with open('api.log', 'w') as f:
+    f.write("")
+
+
 # Configure logging with RotatingFileHandler
 log_handler = RotatingFileHandler(
     filename='api.log',
-    mode='a',  # Append mode
+    mode='w',  # write mode
     maxBytes=5*1024*1024,  # 5 MB
     backupCount=2,  # Keep 2 backup files
     encoding=None,
@@ -34,6 +38,7 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 logger.addHandler(log_handler)
 
+logger.info("---------------------- Wazirx API Logger Started ---------------------------\n")
 
 # # Configure logging
 # logging.basicConfig(
