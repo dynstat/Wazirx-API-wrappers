@@ -2,7 +2,7 @@ from wazirxapi import * #required
 from wazirxapi.helpers import add_query_params
 
 # Configure logging
-logging.basicConfig(level=logging.INFO)
+# logging.basicConfig(level=logging.INFO)
 
 def show_my_funds(wzx_api: WazirxAPIModel,funds_type : str = "all") -> str:
     """
@@ -36,12 +36,12 @@ def show_my_funds(wzx_api: WazirxAPIModel,funds_type : str = "all") -> str:
     # Create the query string
     query_string_array = [f"{key}={value}" for key, value in funds_params_no_signature.items()]
     payload = "&".join(query_string_array)
-    logging.info("Request Payload = %s", payload)
+    logger.info("Request Payload = %s", payload)
 
     # Generate Signature
     if SECRET_KEY:
         signature = hmac.new(SECRET_KEY.encode(), payload.encode(), hashlib.sha256).hexdigest()
-        logging.info("Signature = %s", signature)
+        logger.info("Signature = %s", signature)
     else:
         # RSA signing (assuming you have a method to handle this)
         # from Crypto.PublicKey import RSA
@@ -52,7 +52,7 @@ def show_my_funds(wzx_api: WazirxAPIModel,funds_type : str = "all") -> str:
         # h = SHA256.new(payload.encode())
         # signature = pkcs1_15.new(key).sign(h)
         # signature = base64.b64encode(signature).decode()
-        # logging.info("Signature = %s", signature)
+        # logger.info("Signature = %s", signature)
         pass
 
     # Update URL with signature
@@ -77,12 +77,12 @@ def show_my_funds(wzx_api: WazirxAPIModel,funds_type : str = "all") -> str:
             coin_name = coin_data["asset"]
             if float(coin_data["free"]) > 0:
                 response = f"{coin_name}: free {coin_data['free']}, locked {coin_data['locked']}"
-                logging.info(response)
+                logger.info(response)
     else:
         for coin_data in response.json():
             coin_name = coin_data["asset"]
             response = f"{coin_name}: free {coin_data['free']}, locked {coin_data['locked']}"
-            logging.info(response)
+            logger.info(response)
             
     return response
 
@@ -101,7 +101,7 @@ def show_open_orders(wzx_api: WazirxAPIModel, symbol: str) -> list:
        list: List of open orders for the specified symbol.
     """
     if symbol[:3] not in assets_set and symbol[3:] not in base_currency_set:
-        logging.info("Invalid symbol")
+        logger.info("Invalid symbol")
         return "Invalid symbol"
     # Set Current Time
     current_timestamp = int(time.time() * 1000)
@@ -116,12 +116,12 @@ def show_open_orders(wzx_api: WazirxAPIModel, symbol: str) -> list:
     # Create the query string
     query_string_array = [f"{key}={value}" for key, value in open_orders_params_no_signature.items()]
     payload = "&".join(query_string_array)
-    logging.info("Request Payload = %s", payload)
+    logger.info("Request Payload = %s", payload)
 
     # Generate Signature
     if SECRET_KEY:
         signature = hmac.new(SECRET_KEY.encode(), payload.encode(), hashlib.sha256).hexdigest()
-        logging.info("Signature = %s", signature)
+        logger.info("Signature = %s", signature)
    
     # Update URL with signature
     # url = f"https://api.wazirx.com/sapi/v1/openOrders?{payload}&signature={signature}"
@@ -141,7 +141,7 @@ def show_open_orders(wzx_api: WazirxAPIModel, symbol: str) -> list:
     response = requests.request("GET", open_orders_url, headers=headers)
 
     # Print and return the response
-    logging.info(response.text)
+    logger.info(response.text)
     return json.loads(response.text)
 
 
@@ -162,7 +162,7 @@ def cancel_order(wzx_api: WazirxAPIModel, symbol: str, order_id: str) -> dict:
     """
     
     if symbol[:3] not in assets_set and symbol[3:] not in base_currency_set:
-        logging.info("Invalid symbol")
+        logger.info("Invalid symbol")
         return "Invalid symbol"
     
     # Set Current Time
@@ -179,12 +179,12 @@ def cancel_order(wzx_api: WazirxAPIModel, symbol: str, order_id: str) -> dict:
     # Create the query string
     query_string_array = [f"{key}={value}" for key, value in cancel_order_params_no_signature.items()]
     payload = "&".join(query_string_array)
-    logging.info("Request Payload = %s", payload)
+    logger.info("Request Payload = %s", payload)
 
     # Generate Signature
     if SECRET_KEY:
         signature = hmac.new(SECRET_KEY.encode(), payload.encode(), hashlib.sha256).hexdigest()
-        logging.info("Signature = %s", signature)
+        logger.info("Signature = %s", signature)
    
     # Update URL with signature
     # url = f"https://api.wazirx.com/sapi/v1/order?{payload}&signature={signature}"
@@ -206,7 +206,7 @@ def cancel_order(wzx_api: WazirxAPIModel, symbol: str, order_id: str) -> dict:
     response = requests.request("DELETE", cancel_order_url, headers=headers, data=payload)
 
     # Print and return the response
-    logging.info(response.text)
+    logger.info(response.text)
     return json.loads(response.text)
 
 
@@ -225,7 +225,7 @@ def cancel_all_open_orders(wzx_api: WazirxAPIModel, symbol: str) -> list:
     """
     
     if symbol[:3] not in assets_set and symbol[3:] not in base_currency_set:
-        logging.info("Invalid symbol")
+        logger.info("Invalid symbol")
         return "Invalid symbol"
     
     # Set Current Time
@@ -241,12 +241,12 @@ def cancel_all_open_orders(wzx_api: WazirxAPIModel, symbol: str) -> list:
     # Create the query string
     query_string_array = [f"{key}={value}" for key, value in cancel_all_orders_params_no_signature.items()]
     payload = "&".join(query_string_array)
-    logging.info("Request Payload = %s", payload)
+    logger.info("Request Payload = %s", payload)
 
     # Generate Signature
     if SECRET_KEY:
         signature = hmac.new(SECRET_KEY.encode(), payload.encode(), hashlib.sha256).hexdigest()
-        logging.info("Signature = %s", signature)
+        logger.info("Signature = %s", signature)
    
     # Update URL with signature
     # url = f"https://api.wazirx.com/sapi/v1/openOrders?{payload}&signature={signature}"
@@ -267,7 +267,7 @@ def cancel_all_open_orders(wzx_api: WazirxAPIModel, symbol: str) -> list:
     response = requests.request("DELETE", cancel_all_orders_url, headers=headers, data=payload)
 
     # Print and return the response
-    logging.info(response.text)
+    logger.info(response.text)
     return response.text
 
 
@@ -323,12 +323,12 @@ def place_order(wzx_api: WazirxAPIModel, symbol: str, side: str, order_type: str
     # Create the query string
     query_string_array = [f"{key}={value}" for key, value in order_params_no_signature.items()]
     payload = "&".join(query_string_array)
-    logging.info("Request Payload = %s", payload)
+    logger.info("Request Payload = %s", payload)
 
     # Generate Signature
     if SECRET_KEY:
         signature = hmac.new(SECRET_KEY.encode(), payload.encode(), hashlib.sha256).hexdigest()
-        logging.info("Signature = %s", signature)
+        logger.info("Signature = %s", signature)
    
     # Update URL with signature
     # url = f"https://api.wazirx.com/sapi/v1/order?{payload}&signature={signature}"
@@ -354,11 +354,11 @@ def place_order(wzx_api: WazirxAPIModel, symbol: str, side: str, order_type: str
 
     # Print and return the response
     if response.status_code == 201:
-        logging.info("Response Status Code = 200")
-        logging.info(response.text)
+        logger.info("Response Status Code = 200")
+        logger.info(response.text)
         
         return json.loads(response.text)
     else:
-        logging.error("Response Status Code = %s", response.status_code)
-        logging.error(response.text)
+        logger.error("Response Status Code = %s", response.status_code)
+        logger.error(response.text)
         return None
