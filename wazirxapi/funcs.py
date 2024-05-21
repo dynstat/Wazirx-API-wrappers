@@ -1,8 +1,29 @@
 from wazirxapi import * #required
 from wazirxapi.helpers import add_query_params
 
-# Configure logging
-# logging.basicConfig(level=logging.INFO)
+def get_ticker_24hr(wzx_api: WazirxAPIModel, symbol: str) -> str:
+    """
+    Retrieves the 24-hour price ticker for a specified symbol in a user's WazirX account.
+
+    This function constructs a request to the WazirX API to fetch the 24-hour price ticker. It constructs the request URL and sends the request. The response is then parsed, and the ticker information is printed out.
+
+    Parameters:
+        wzx_api (WazirxAPIModel): The API model instance containing API endpoint configurations.
+        symbol (str): The trading pair symbol (e.g., 'xrpinr') for which to fetch the ticker.
+
+    Returns:
+       str: Returns and prints the response from the WazirX API.
+    """
+    # Construct the URL for the ticker API
+    ticker_params = {'symbol': symbol}
+    ticker_url = add_query_params(wzx_api.ticker_24hr, ticker_params)
+
+    # Send the GET request
+    response = requests.get(ticker_url)
+
+    # Print and return the response text
+    # print(response.text)
+    return json.loads(response.text)
 
 def show_my_funds(wzx_api: WazirxAPIModel,funds_type : str = "all") -> str:
     """
