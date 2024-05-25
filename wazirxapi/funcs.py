@@ -383,3 +383,56 @@ def place_order(wzx_api: WazirxAPIModel, symbol: str, side: str, order_type: str
         logger.error("Response Status Code = %s", response.status_code)
         logger.error(response.text)
         return None
+
+
+def query_order(wzx_api: WazirxAPIModel, order_id: str) -> dict:
+    """
+    Queries the status of an order for a specified order ID in a user's WazirX account.
+
+    This function constructs a request to the WazirX API to query the status of an order. It handles the generation of the necessary signature for API authentication, constructs the request URL, and sends the request. The response is then parsed, and the order status is printed out.
+
+    Parameters:
+        wzx_api (WazirxAPIModel): The API model instance containing API endpoint configurations.
+        order_id (str): The ID of the order to be queried.
+
+    Returns:
+       dict: Returns and prints the response from the WazirX API.
+    """
+    # Set Current Time
+    current_timestamp = int(time.time() * 1000)
+    
+    # Generate Request Payload
+    query_order_params_no_signature = {
+        'orderId': order_id,
+        'recvWindow': '20000',
+        'timestamp': current_timestamp
+    }
+
+    # Create the query string
+    query_string_array = [f"{key}={value}" for key, value in query_order_params_no_signature.items()]
+    payload = "&".join(query_string_array)
+    logger.info("Request Payload = %s", payload)
+
+    # Generate Signature
+    if SECRET_KEY:
+        signature = hmac.new(SECRET_KEY.encode(), payload.encode(), hashlib.sha256).hexdigest()
+        logger.info("Signature = %s", signature)
+    
+    # Update URL with signature
+    query_order_params = {
+        'orderId': order_id,
+        'recvWindow': 20000,
+        'timestamp': current_timestamp,
+        'signature': signature,
+    }
+    
+    query_order_url = add_query_params(wzx_api.order, query_order_params)
+    headers = {
+        'X-Api-Key': APIKEY
+    }
+
+    response = requests.request("GET", query_order_url, headers=headers, data=payload)
+
+    # Print and return the response
+    logger.info(response.text)
+    return json.loads(response.text)
