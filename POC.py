@@ -13,7 +13,7 @@ import threading
 import time
 
 # Constants
-INR_FOR_XRP = 150  # Maximum INR amount to use for XRP
+INR_FOR_XRP = 350  # Maximum INR amount to use for XRP
 XRP_AMOUNT = 0
 STOP_LOSS_THRESHOLD = 0.05  # 5% stop loss
 PROFIT_THRESHOLD = 0.02  # 2% profit to re-enter
@@ -40,23 +40,29 @@ def update_market_data(symbols):
                 }
             time.sleep(3)  # Avoid rate limiting
         time.sleep(5)
-        print(f"Updated live_market_data for {symbol}: {live_market_data[symbol]}")
+        print(f"Updated live_market_data: {live_market_data}")
 
 
 def trading_bot():
+    current_price = 0
     try:
         global XRP_AMOUNT, INR_FOR_XRP, latest_top_price, latest_bottom_price, buy_points, buy_count
-        
+        flag = 0
         while True:
+            time.sleep(1)
             # Fetch open orders for the symbol "xrpinr"
             open_orders = show_open_orders(wzx_api, symbol="xrpinr")
-            if open_orders:
+            if open_orders and flag == 0:
                 for order in open_orders:
                     # Remove unwanted keys and update the last placed orders dictionary
                     last_placed_orders[order["symbol"]] = remove_unwanted_keys(order)
-
-            # Get the current price of XRP in INR from the live market data
-            current_price = live_market_data.get("xrpinr", {}).get("lastPrice", 0)
+                # Set buy_count to 1 and update buy_points list with the current price
+                buy_count = 1
+                current_price = live_market_data.get("xrpinr", {}).get("lastPrice", 0)
+                buy_points = [float(last_placed_orders[order["symbol"]]["price"])]
+                flag = 1  # Ensure this block runs only once per session
+            # # Get the current price of XRP in INR from the live market data
+            # current_price = live_market_data.get("xrpinr", {}).get("lastPrice", 0)
 
             # If we currently own XRP, check for selling conditions
             if XRP_AMOUNT > 0:
@@ -116,7 +122,7 @@ def trading_bot():
                         buy_points.append(current_price)
                     else:
                         # Calculate the next buy point using the multiplier Y
-                        next_buy_point = buy_points[-1] * Y
+                        next_buy_point = round(buy_points[-1] * Y, 2)  # Ensure the buy point is rounded to two decimal places
                         # Check if the current price is less than or equal to the next buy point
                         if current_price <= next_buy_point:
                             buy_points.append(next_buy_point)
